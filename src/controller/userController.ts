@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
-import { registerSchema } from "../schema/authSchema.js";
-import { registerUserService } from "../services/userService.js";
+import { registerSchema, logInSchema } from "../schema/authSchema.js";
+import { registerUserService, logInService } from "../services/userService.js";
+
 
 
 export async function registerUser(req:Request, res:Response, next: NextFunction){
@@ -9,6 +10,24 @@ export async function registerUser(req:Request, res:Response, next: NextFunction
         const input = registerSchema.parse(req.body);
         const user = await registerUserService(input);
         return res.status(201).json({user})
+    } catch (error) {
+        if (error instanceof ZodError){
+            return res.status(400).json({
+                error:"Invalid registration data",
+                details:error.issues,
+            })
+        }
+        return next(error);
+    }
+}
+
+
+export async function LoginUser(req:Request, res:Response, next:NextFunction){
+    try {
+        const input = logInSchema.parse(req.body);
+        const user = await logInService(input);
+        return res.status(201).json({user})
+
     } catch (error) {
         if (error instanceof ZodError){
             return res.status(400).json({

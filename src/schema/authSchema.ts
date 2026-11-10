@@ -6,3 +6,8 @@ email: z.email("Invalid email address"),
 password: z.string().min(8, "Password must be atleast 8 characters")
 })
 
+
+export const logInSchema = z.object({
+    email: z.email("Email not found"),
+    password: z.string("Password doesn't match")
+})
